@@ -1,0 +1,9 @@
+Flask
+flask-restx
+mysql-connector-python
+pyjwt
+python-dotenv
+flask-swagger-ui
+requests
+flask_jwt_extended
+flask-cors

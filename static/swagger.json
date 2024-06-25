@@ -1,0 +1,177 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "ChatBot API",
+      "description": "API documentation for ChatBot",
+      "version": "1.0.0"
+    },
+    "basePath": "/",
+    "schemes": [
+      "http"
+    ],
+    "tags": [
+      {
+        "name": "auth",
+        "description": "Authentication related endpoints"
+      }
+    ],
+    "paths": {
+      "/auth/login": {
+        "post": {
+          "tags": ["auth"],
+          "summary": "Login",
+          "description": "User login",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "access_token": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid credentials"
+            }
+          }
+        }
+      },
+      "/auth/register": {
+        "post": {
+          "tags": ["auth"],
+          "summary": "Register",
+          "description": "User registration",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Registration successful"
+            }
+          }
+        }
+      },
+      "/auth/refresh-token": {
+        "post": {
+          "tags": ["auth"],
+          "summary": "Refresh Token",
+          "description": "Refresh authentication token",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Token refreshed successfully",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "access_token": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid or expired refresh token"
+            }
+          }
+        }
+      },
+      "/auth/logout": {
+        "get": {
+          "tags": ["auth"],
+          "summary": "Logout",
+          "description": "User logout",
+          "responses": {
+            "200": {
+              "description": "Logout successful"
+            }
+          }
+        }
+      },
+      "/auth/get-profile": {
+        "get": {
+          "tags": ["auth"],
+          "summary": "Get Profile",
+          "description": "Get user profile",
+          "responses": {
+            "200": {
+              "description": "User profile retrieved successfully",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id":{
+                    "type" :"string"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
