@@ -35,7 +35,6 @@ Project Sotatek Intern Backend is a RESTful API service built using Flask, desig
 
 5. **Run the application:**
 ``` bash
-    cd APIGateway
     python app.py
 ```
 
