@@ -9,7 +9,6 @@ Project Sotatek Intern Backend is a RESTful API service built using Flask, desig
 
 ```bash
     git clone https://github.com/sotaicg/webchatbot_be.git
-    cd Project_Sotatek_Backend
 ```
 
 2. **Create a virtual environment and activate it:**
