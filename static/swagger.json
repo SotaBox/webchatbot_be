@@ -1,177 +1,332 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "title": "ChatBot API",
-      "description": "API documentation for ChatBot",
-      "version": "1.0.0"
+  "swagger": "2.0",
+  "info": {
+    "title": "ChatBot API",
+    "description": "API documentation for ChatBot",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Authentication related endpoints"
     },
-    "basePath": "/",
-    "schemes": [
-      "http"
-    ],
-    "tags": [
-      {
-        "name": "auth",
-        "description": "Authentication related endpoints"
+    {
+      "name": "chat",
+      "description": "Chat related endpoints"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login",
+        "description": "User login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string"
+                },
+                "refresh_token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
       }
-    ],
-    "paths": {
-      "/auth/login": {
-        "post": {
-          "tags": ["auth"],
-          "summary": "Login",
-          "description": "User login",
-          "parameters": [
-            {
-              "in": "body",
-              "name": "body",
-              "required": true,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Register",
+        "description": "User registration",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
                 }
               }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Login successful",
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "access_token": {
-                    "type": "string"
-                  },
-                  "refresh_token": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "401": {
-              "description": "Invalid credentials"
             }
           }
-        }
-      },
-      "/auth/register": {
-        "post": {
-          "tags": ["auth"],
-          "summary": "Register",
-          "description": "User registration",
-          "parameters": [
-            {
-              "in": "body",
-              "name": "body",
-              "required": true,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Registration successful"
-            }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registration successful"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
           }
         }
-      },
-      "/auth/refresh-token": {
-        "post": {
-          "tags": ["auth"],
-          "summary": "Refresh Token",
-          "description": "Refresh authentication token",
-          "parameters": [
-            {
-              "in": "body",
-              "name": "body",
-              "required": true,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "refresh_token": {
-                    "type": "string"
-                  }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Refresh Token",
+        "description": "Refresh authentication token",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refresh_token": {
+                  "type": "string"
                 }
               }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Token refreshed successfully",
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "access_token": {
-                    "type": "string"
-                  },
-                  "refresh_token": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "401": {
-              "description": "Invalid or expired refresh token"
             }
           }
-        }
-      },
-      "/auth/logout": {
-        "get": {
-          "tags": ["auth"],
-          "summary": "Logout",
-          "description": "User logout",
-          "responses": {
-            "200": {
-              "description": "Logout successful"
-            }
-          }
-        }
-      },
-      "/auth/get-profile": {
-        "get": {
-          "tags": ["auth"],
-          "summary": "Get Profile",
-          "description": "Get user profile",
-          "responses": {
-            "200": {
-              "description": "User profile retrieved successfully",
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "id":{
-                    "type" :"string"
-                  },
-                  "username": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string"
+                },
+                "refresh_token": {
+                  "type": "string"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Logout",
+        "description": "User logout",
+        "responses": {
+          "200": {
+            "description": "Logout successful"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/get-profile": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Get Profile",
+        "description": "Get user profile",
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/chat/process-message": {
+      "post": {
+        "tags": ["chat"],
+        "summary": "Process Message",
+        "description": "Process a chat message",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message processed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message-bot": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired access token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/chat/get_list_url": {
+      "get": {
+        "tags": ["chat"],
+        "summary": "Get List URL",
+        "description": "Get list URL and related content",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "url",
+            "required": true,
+            "type": "string",
+            "description": "URL to get data for"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string",
+            "description": "Bearer token for authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "vector_status": {
+                  "type": "string",
+                  "enum": ["fail", "success", "inprogress", "null"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "No data found for the given URL"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "responses": {
+    "InternalServerError": {
+      "description": "Internal server error",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
           }
         }
       }
     }
   }
-  
+}

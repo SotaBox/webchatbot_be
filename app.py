@@ -6,6 +6,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 # Import the blueprint
 from routers.auth_routers import routers_auth
+from routers.chat_routers import routers_chat
 
 app = Flask(__name__)
 CORS(app)
@@ -31,6 +32,7 @@ jwt = JWTManager(app)
 # Register blueprints
 app.register_blueprint(swaggerui_blueprint,url_prefix = SWAGGER_URL)
 app.register_blueprint(routers_auth)
+app.register_blueprint(routers_chat)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080)
