@@ -1,0 +1,84 @@
+name: CI/CD for development environment (webchatbot)
+
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - '*'
+  # pull_request:
+  #   branches:
+  #     - develop
+
+env:
+  REPOSITORY_NAME: registry.sotaicg.com
+  PROJECT_NAME: intern
+  TAG: latest
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux, x64, development]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: http://registry.sotaicg.com/
+          username: ${{ secrets.REPOSITORY_USERNAME }}
+          password: ${{ secrets.REPOSITORY_PASSWORD }}
+          logout: false
+          
+      - name: Determine tag
+        if: always()
+        run: |
+          if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
+            TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          else
+            TAG="${{ env.TAG }}"
+          fi
+          echo "Tag: $TAG"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Build and push to Harbor repository
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.REPOSITORY_NAME }}/${{ env.PROJECT_NAME }}/api_endpoints:latest
+          # build-args: |
+          #     REACT_APP_API_URL=https://dev.data-platform-api.sotaicg.com/api/v1
+          #     REACT_APP_DOMAIN_API_SDK=dev.data-platform-api.sotaicg.com/
+          #     REACT_APP_CHUNK_SIZE_MB=100
+          #     REACT_APP_GOOGLE_CLIENT_ID=81963526024-m0rt10khegk1fici68g7punu1spuqnhs.apps.googleusercontent.com
+        
+  deploy:
+    needs: build
+    runs-on: [self-hosted, linux, x64, development]
+    if: (startsWith(github.ref, 'refs/heads/develop') || startsWith(github.ref, 'refs/tags/')) && ${{ needs.build.result == 'success' }}
+    steps:
+        
+      - name: Updating for new configuration (webchatbot)
+        run: |
+          ls
+          cd /home/epc/intern
+          export FILE_NAME=docker-compose.yaml
+          export SERVICE=be
+          docker compose -f $FILE_NAME down $SERVICE && docker compose -f $FILE_NAME pull $SERVICE && docker compose -f $FILE_NAME up --build $SERVICE -d
+    
+  report:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest #[self-hosted, linux, x64, root-test]
+    steps:
+      - name: Notify Google Chat
+        if: ${{ always() }} # Use always to ensure that the notification is also send on failure of former steps
+        uses: SimonScholz/google-chat-action@main
+        with:
+          webhookUrl: 'https://chat.googleapis.com/v1/spaces/AAAAoly1e8w/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=uZLufAeOb9UIrPQpkrylfo5LcoIFK2HDLZWPA1Fbjkc'
+          jobStatus: '${{ job.status }}'
+          subtitle: truec
