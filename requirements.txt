@@ -7,4 +7,4 @@ flask-swagger-ui
 requests
 flask_jwt_extended
 flask-cors
-openai
+beautifulsoup4
