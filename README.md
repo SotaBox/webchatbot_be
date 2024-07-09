@@ -1,7 +1,7 @@
 # Project Sotatek Intern Backend
 
 ## Introduction
-Project Sotatek Intern Backend is a RESTful API service built using Flask, designed to handle user authentication and profile management. The project includes functionalities such as user registration, login, logout, token refresh, and profile retrieval. We then process the incoming information to return webchat responses through Azure Openai
+Project Sotatek Intern Backend is a RESTful API service built using Flask, designed to handle user authentication and profile management. The project includes functionalities such as user registration, login, logout, token refresh, and profile retrieval. We then process the incoming information to return webchat responses through Azure Openai. Integrating a data crawling function allows users to collect information with just a few simple clicks.
 
 ## Setup and Installation
 

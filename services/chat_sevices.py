@@ -3,7 +3,6 @@ from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from flask import request
 import requests
 from repo.user import check_access_token
-from repo.url import get_list_url_from_db
 from config.config import Config
 from package.http.http import HttpClient
 import logging
@@ -73,14 +72,3 @@ class ChatService:
             logging.error("Error calling Azure OpenAI API: %s", str(e))
             return "Sorry, I couldn't process that request at the moment."
     
-    @staticmethod 
-    def get_url_data(url):
-        try:
-            data= get_list_url_from_db(url)
-            if data:
-                return data, 200
-            else:
-                return {'error': 'Data not found for the given URL'}, 404
-        except Exception as e:
-            logging.error("Error getting URL data: %s", str(e))
-            return {'error': 'An error occurred while getting URL data', 'details': str(e)}, 500

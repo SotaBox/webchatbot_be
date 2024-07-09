@@ -30,6 +30,7 @@ class HttpClient:
             query_params = '&'.join(f"{key}={value}" for key, value in params.items())
             url += f"?{query_params}"
         return url
+    
     def post_to_azure_open_ai(message: str):
         endpoint = Config.AZURE_OPENAI_ENDPOINT
         api_key = Config.AZURE_OPENAI_KEY

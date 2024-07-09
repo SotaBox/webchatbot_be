@@ -17,6 +17,10 @@
     {
       "name": "chat",
       "description": "Chat related endpoints"
+    },
+    {
+      "name": "crawl",
+      "description": "Crawl related endpoints"
     }
   ],
   "paths": {
@@ -254,25 +258,154 @@
         }
       }
     },
-    "/chat/get_list_url": {
+    "/crawl/crawl-sitemap": {
+      "post": {
+        "tags": ["crawl"],
+        "summary": "Crawl Sitemap",
+        "description": "Crawl links from a sitemap",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sitemap crawled successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/crawl-data": {
+      "post": {
+        "tags": ["crawl"],
+        "summary": "Crawl Data",
+        "description": "Crawl data from a link",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "link": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data crawled successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "vector_status": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/get-list-link": {
       "get": {
-        "tags": ["chat"],
-        "summary": "Get List URL",
-        "description": "Get list URL and related content",
+        "tags": ["crawl"],
+        "summary": "Get List of Links",
+        "description": "Get list of links for a given URL",
         "parameters": [
           {
             "in": "query",
             "name": "url",
             "required": true,
-            "type": "string",
-            "description": "URL to get data for"
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Links retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "No data found for the given URL"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/get-data-from-link": {
+      "get": {
+        "tags": ["crawl"],
+        "summary": "Get Data from Link",
+        "description": "Get data from a given link",
+        "parameters": [
           {
-            "in": "header",
-            "name": "Authorization",
+            "in": "query",
+            "name": "link",
             "required": true,
-            "type": "string",
-            "description": "Bearer token for authentication"
+            "type": "string"
           }
         ],
         "responses": {
@@ -287,12 +420,20 @@
                 "url": {
                   "type": "string"
                 },
+                "title": {
+                  "type": "string"
+                },
                 "description": {
                   "type": "string"
                 },
+                "content": {
+                  "type": "string"
+                },
                 "vector_status": {
-                  "type": "string",
-                  "enum": ["fail", "success", "inprogress", "null"]
+                  "type": "string"
+                },
+                "crawled_at": {
+                  "type": "string"
                 }
               }
             }
@@ -300,8 +441,60 @@
           "400": {
             "description": "Invalid input"
           },
-          "401": {
-            "description": "Unauthorized"
+          "404": {
+            "description": "No data found for the given link"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/search-data-from-url": {
+      "get": {
+        "tags": ["crawl"],
+        "summary": "Search Data from URL",
+        "description": "Search data from a given URL",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "url",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "vector_status": {
+                  "type": "string"
+                },
+                "crawled_at": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
           },
           "404": {
             "description": "No data found for the given URL"
