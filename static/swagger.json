@@ -352,7 +352,7 @@
         }
       }
     },
-    "/crawl/get-list-link": {
+    "/crawl/get-sitemap": {
       "get": {
         "tags": ["crawl"],
         "summary": "Get List of Links",
