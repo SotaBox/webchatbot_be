@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from repo.url_stiemap import insert_data_to_db , insert_link_to_db , check_link_exists, get_list_link_from_db , get_data_link , get_data_url
 import logging
+import re
 
 class CrawlService:
     @staticmethod
@@ -13,15 +14,18 @@ class CrawlService:
 
                 # Extract unique links
                 links_set = {a['href'] for a in soup.find_all('a', href=True)}
-                links = list(links_set)
+
+                # Optional: Filter links using regex 
+                regex = re.compile(r"((https?):((//)|(\\\\))+[\w\d:#@%/;$()~_?\+-=\\\.&]*)", re.MULTILINE|re.UNICODE)
+                filtered_links = [link for link in links_set if regex.match(link)]
                 
                 # Check and insert links
-                for link in links:
+                for link in filtered_links:
                     if not check_link_exists(link):
                         insert_link_to_db(link, url)
 
                 return {   
-                    'links': links
+                    'links': filtered_links
                 }, 200
             else:
                 return {'error': f"Failed to retrieve the URL: {url}"}, 400
