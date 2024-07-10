@@ -69,7 +69,7 @@ jobs:
           cd /home/epc/intern
           export FILE_NAME=docker-compose.yaml
           export SERVICE=be
-          docker compose -f $FILE_NAME down $SERVICE && docker compose -f $FILE_NAME pull $SERVICE && docker compose -f $FILE_NAME up --build $SERVICE -d
+          docker compose -f $FILE_NAME stop $SERVICE && docker compose -f $FILE_NAME rm -f $SERVICE && docker compose -f $FILE_NAME pull $SERVICE && docker compose -f $FILE_NAME up --build $SERVICE -d
     
   report:
     needs: [build, deploy]
