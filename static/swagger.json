@@ -271,13 +271,13 @@
             "schema": {
               "type": "object",
               "properties": {
-                "url": {
+                "parent_link": {
                   "type": "string",
                   "description": "URL of the sitemap to crawl"
                 }
               },
               "example": {
-                "url": "http://example.com"
+                "parent_link": "http://example.com"
               }
             }
           }
@@ -413,18 +413,18 @@
         }
       }
     },
-    "/crawl/search-data-from-url": {
+    "/crawl/search-data-from-parent-link": {
       "get": {
         "tags": ["crawl"],
-        "summary": "Search Data from URL",
-        "description": "Search data from a given URL",
+        "summary": "Search Data from Parent link",
+        "description": "Search data from a given parent link",
         "parameters": [
           {
             "in": "query",
-            "name": "url",
+            "name": "parent_link",
             "required": true,
             "type": "string",
-            "description": "URL to search data from"
+            "description": "Parent link to retrieve child links from"
           }
         ],
         "responses": {
