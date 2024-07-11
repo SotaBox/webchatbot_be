@@ -1,29 +1,518 @@
-### Changlog
-## Release v1.0.0(25/06/2024)
-# New Features:
-
-- Add modules to handle login (login.py), logout (logout.py), refresh token (refresh_token.py), get user information (get_profile.py), register (register.py) in auth_handlers.
-- Add router to handle login, register and token management (auth_routers.py).
-- Add service to handle authentication related logic (auth_services.py).
-- Add user.py repo to interact with database for User entity.
-
-## Release v1.0.1(28/06/2024)
-# Add new feartures:
-
-- Add module to handle process message (process_mesage.py) in chat_handlers.
-- Add router to handle process message (chat_routers.py)
-- Add service to handle the process of giving the sever's answer to the client, comblined with Azure OpenAI
-
-## Release v1.0.2(09/07/2024)
-# Add new feartures:
-
-- Add module to crawl list of links from URL (craw_sitemap.py) in crawl_handlers.
-- Add module to crawl data from links (crawl_link.py) in crawl_handlers.
-- Add router to handle crawling operations (crawl_routers.py)
-- Add service to handle crawl related logic (crawl_services.py).
-- Add url_sitemap.py repo to interact with database for URL entity.
-
-## Release v1.0.3(11/7/2024)
-# Changes:
-
-- Switched from using the `url_sitemap` table to using separate tables `parent_link` and `link` to manage hierarchical link data more efficiently. 
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ChatBot API",
+    "description": "API documentation for ChatBot",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Authentication related endpoints"
+    },
+    {
+      "name": "chat",
+      "description": "Chat related endpoints"
+    },
+    {
+      "name": "crawl",
+      "description": "Crawl related endpoints"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login",
+        "description": "User login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string"
+                },
+                "refresh_token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Register",
+        "description": "User registration",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registration successful"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Refresh Token",
+        "description": "Refresh authentication token",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refresh_token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string"
+                },
+                "refresh_token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Logout",
+        "description": "User logout",
+        "responses": {
+          "200": {
+            "description": "Logout successful"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/auth/get-profile": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Get Profile",
+        "description": "Get user profile",
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/chat/process-message": {
+      "post": {
+        "tags": ["chat"],
+        "summary": "Process Message",
+        "description": "Process a chat message",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message processed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message-bot": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired access token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/crawl-sitemap": {
+      "post": {
+        "tags": ["crawl"],
+        "summary": "Crawl Sitemap",
+        "description": "Crawl links from a sitemap",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "URL of the sitemap to crawl"
+                }
+              },
+              "example": {
+                "url": "http://example.com"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sitemap crawled successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/crawl-data": {
+      "post": {
+        "tags": ["crawl"],
+        "summary": "Crawl Data",
+        "description": "Crawl data from a specific link using its ID",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "ID of the link to crawl data from"
+                }
+              },
+              "example": {
+                "id": 70
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data crawled successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "vector_status": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "No data found for the given ID"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/get-data-from-link": {
+      "get": {
+        "tags": ["crawl"],
+        "summary": "Get Data from Link",
+        "description": "Get data from a specific link using its ID",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the link to retrieve data from"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id":{
+                  "type" : "integer"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "vector_status": {
+                  "type": "string"
+                },
+                "link":{
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "No data found for the given ID"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/search-data-from-url": {
+      "get": {
+        "tags": ["crawl"],
+        "summary": "Search Data from URL",
+        "description": "Search data from a given URL",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "url",
+            "required": true,
+            "type": "string",
+            "description": "URL to search data from"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer" 
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "vector_status": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "No data found for the given URL"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/crawl/get-sitemap": {
+      "get": {
+        "tags": ["crawl"],
+        "summary": "Get Sitemap",
+        "description": "Get links from a parent link",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "parent_link",
+            "required": true,
+            "type": "string",
+            "description": "Parent link to retrieve child links from"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sitemap retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "$ref": "#/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "responses": {
+    "InternalServerError": {
+      "description": "Internal server error",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
