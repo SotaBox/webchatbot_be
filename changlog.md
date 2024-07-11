@@ -22,3 +22,8 @@
 - Add router to handle crawling operations (crawl_routers.py)
 - Add service to handle crawl related logic (crawl_services.py).
 - Add url_sitemap.py repo to interact with database for URL entity.
+
+## Release v1.0.3(11/7/2024)
+# Changes:
+
+- Switched from using the `url_sitemap` table to using separate tables `parent_link` and `link` to manage hierarchical link data more efficiently. 

@@ -4,13 +4,13 @@ from services.chat_sevices import ChatService
 
 def crawl_sitemap_handler():
     data = request.get_json()
-    url = data.get('url')
-    if not url:
-        return jsonify({'error': 'URL is required'}), 400
+    parent_link = data.get('parent_link')
+    if not parent_link:
+        return jsonify({'error': 'Parent link is required'}), 400
     
     access_token_error = ChatService.check_valid_access_token()
     if access_token_error:
         return jsonify(access_token_error[0]), access_token_error[1]
     
-    response, status_code = CrawlService.crawl_sitemap(url)
+    response, status_code = CrawlService.crawl_sitemap(parent_link)
     return jsonify(response), status_code
