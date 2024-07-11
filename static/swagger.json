@@ -306,7 +306,7 @@
         }
       }
     },
-    "/crawl/crawl-data": {
+    "/crawl/crawl-data-from-link": {
       "post": {
         "tags": ["crawl"],
         "summary": "Crawl Data",
