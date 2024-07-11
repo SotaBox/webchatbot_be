@@ -29,7 +29,7 @@ def get_sitemap():
 def get_data_link():
     return get_data_link_handler()
 
-@routers_crawl.route('/crawl/search-data-from-url',methods = ['GET'])
+@routers_crawl.route('/crawl/search-data-from-parent-link',methods = ['GET'])
 @jwt_required()
 def search_data_from_url():
     return search_data_from_parent_link_handler()
