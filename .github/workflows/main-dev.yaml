@@ -1,0 +1,91 @@
+name: CI/CD for development environment (webchatbot_be)
+
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - '*'
+  # pull_request:
+  #   branches:
+  #     - develop
+
+env:
+  REPOSITORY_NAME: registry.sotaicg.com
+  PROJECT_NAME: intern
+  TAG: latest
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux, x64]
+    outputs:
+      output1: ${{ steps.SHA_ID.outputs.TAG_SHA }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: http://registry.sotaicg.com/
+          username: ${{ secrets.REPOSITORY_USERNAME }}
+          password: ${{ secrets.REPOSITORY_PASSWORD }}
+          logout: false
+          
+      - name: Determine tag
+        if: always()
+        run: |
+          if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
+            TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          else
+            TAG="${{ env.TAG }}"
+          fi
+          echo "Tag: $TAG"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Build Harbor repository
+        run: |
+          docker build -t ${{ env.REPOSITORY_NAME }}/${{ env.PROJECT_NAME }}/api_endpoints:latest .
+          
+      - name: Push to repository
+        run: docker push ${{ env.REPOSITORY_NAME }}/${{ env.PROJECT_NAME }}/api_endpoints:latest
+
+      - name: Get Docker image digest
+        id: SHA_ID
+        run: |
+          TAG_SHA1=$(docker inspect --format='{{index .RepoDigests 0}}' "${{ env.REPOSITORY_NAME }}/${{ env.PROJECT_NAME }}/api_endpoints:latest" | cut -d '@' -f 2-)
+          echo "TAG_SHA=$TAG_SHA1" >> $GITHUB_OUTPUT
+      - name: Output
+        run: echo ${{ steps.SHA_ID.outputs.TAG_SHA }}
+              
+  deploy:
+    needs: build
+    runs-on: [self-hosted, linux, x64]
+    if: (startsWith(github.ref, 'refs/heads/develop') || startsWith(github.ref, 'refs/tags/')) && ${{ needs.build.result == 'success' }}
+    steps:
+        
+      - name: Updating for new configuration (webchatbot)
+        env:
+          OUTPUT1: ${{needs.build.outputs.output1}}
+        run: |
+          ls
+          cd /home/epc/intern
+          export FILE_NAME=docker-compose.yaml
+          export SERVICE=be
+          sed -i "/^\s*be:/,/^\s*[^ ]/ s|^\(\s*image:\s*\).*|\1registry.sotaicg.com/intern/api_endpoints:latest@$OUTPUT1|" docker-compose.yaml
+          docker compose -f $FILE_NAME stop $SERVICE && docker compose -f $FILE_NAME rm -f $SERVICE && docker compose -f $FILE_NAME pull $SERVICE && docker compose -f $FILE_NAME up --build $SERVICE -d
+    
+  report:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest #[self-hosted, linux, x64, root-test]
+    steps:
+      - name: Notify Google Chat
+        if: ${{ always() }} # Use always to ensure that the notification is also send on failure of former steps
+        uses: SimonScholz/google-chat-action@main
+        with:
+          webhookUrl: 'https://chat.googleapis.com/v1/spaces/AAAAoly1e8w/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=uZLufAeOb9UIrPQpkrylfo5LcoIFK2HDLZWPA1Fbjkc'
+          jobStatus: '${{ job.status }}'
+          subtitle: true
