@@ -57,3 +57,6 @@ Project Sotatek Intern Backend is a RESTful API service built using Flask, desig
 
 
 
+
+
+<!-- Security scan triggered at 2026-10-07 14:41:01 -->
